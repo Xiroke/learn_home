@@ -30,9 +30,9 @@ class MainWindow(QWidget):
         self.tasks_list.itemClicked.connect(self.task_detail)
         self.categories_list.itemClicked.connect(self.category_detail)
         self.button_add_task.clicked.connect(self.add_task)
-        self.button_delete_task.clicked.connect(self.delete_task)
+        self.button_delete_task.clicked.connect(self.check_button)
         self.button_add_category.clicked.connect(self.add_category)
-        self.button_delete_category.clicked.connect(self.delete_category)
+        self.button_delete_category.clicked.connect(check_button)
         self.button_edit_task.clicked.connect(self.edit_task)
         self.button_edit_category.clicked.connect(self.edit_category)
 
@@ -159,23 +159,7 @@ class MainWindow(QWidget):
         )
         self.load_tasks()
 
-    def delete_task(self):
-        row = self.tasks_list.currentRow()
-        task_id = self.tasks[row][0]
-        message_box = QMessageBox()
-        message_box.setIcon(QMessageBox.Warning)
-        message_box.setText(f"Вы точно хотите удалить задачу: {self.tasks[row][1]}?")
-        message_box.setWindowTitle("Удалить категорию?")
-        message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
-        message_box.show()
-        result = message_box.exec()
-        if result == QMessageBox.Yes:
-            query = QSqlQuery()
-            query.exec(
-                f"""DELETE FROM tasks 
-                WHERE id={task_id};"""
-            )
-            self.load_tasks()
+
 
     def edit_task(self):
         row = self.tasks_list.currentRow()
@@ -201,12 +185,19 @@ class MainWindow(QWidget):
         )
         self.load_categories()
 
-    def delete_category(self):
-        row = self.categories_list.currentRow()
-        category_id = self.categories[row][0]
+    def check_button(self):
+        sender = self.sender()
+        if sender.text == 'Удалить задачу':
+            self.delete_someone(self.tasks_list, self.tasks)
+            self.load_tasks()
+        else:
+
+    def delete_someone(self, field_delete, field):
+        row = field_delete.tasks_list.currentRow()
+        our_id = field[row][0]
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Warning)
-        message_box.setText(f"Вы точно хотите удалить категорию: {self.categories[row][1]}?")
+        message_box.setText(f"Вы точно хотите удалить задачу: {field[row][1]}?")
         message_box.setWindowTitle("Удалить категорию?")
         message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         message_box.show()
@@ -214,10 +205,28 @@ class MainWindow(QWidget):
         if result == QMessageBox.Yes:
             query = QSqlQuery()
             query.exec(
-                f"""DELETE FROM categories 
-                WHERE id={category_id};"""
+                f"""DELETE FROM tasks 
+                WHERE id={our_id};"""
             )
-            self.load_categories()
+            self.load_tasks()
+
+    # def delete_category(self):
+    #     row = self.categories_list.currentRow()
+    #     category_id = self.categories[row][0]
+    #     message_box = QMessageBox()
+    #     message_box.setIcon(QMessageBox.Warning)
+    #     message_box.setText(f"Вы точно хотите удалить категорию: {self.categories[row][1]}?")
+    #     message_box.setWindowTitle("Удалить категорию?")
+    #     message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
+    #     message_box.show()
+    #     result = message_box.exec()
+    #     if result == QMessageBox.Yes:
+    #         query = QSqlQuery()
+    #         query.exec(
+    #             f"""DELETE FROM categories 
+    #             WHERE id={category_id};"""
+    #         )
+    #         self.load_categories()
 
     def edit_category(self):
         row = self.categories_list.currentRow()
