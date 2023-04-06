@@ -187,17 +187,21 @@ class MainWindow(QWidget):
 
     def check_button(self):
         sender = self.sender()
-        if sender.text == 'Удалить задачу':
-            self.delete_someone(self.tasks_list, self.tasks)
+        if sender.text() == 'Удалить задачу':
+            self.delete_someone(self.tasks_list, self.tasks, 'tasks')
             self.load_tasks()
-        else:
 
-    def delete_someone(self, field_delete, field):
-        row = field_delete.tasks_list.currentRow()
+        else:
+            self.delete_someone(self.categories_list, self.categories, 'categories')
+            self.load_categories()
+
+
+    def delete_someone(self, field_delete, field, text):
+        row = field_delete.currentRow()
         our_id = field[row][0]
         message_box = QMessageBox()
         message_box.setIcon(QMessageBox.Warning)
-        message_box.setText(f"Вы точно хотите удалить задачу: {field[row][1]}?")
+        message_box.setText(f"Вы точно хотите удалить: {field[row][1]}?")
         message_box.setWindowTitle("Удалить категорию?")
         message_box.setStandardButtons(QMessageBox.Yes | QMessageBox.No)
         message_box.show()
@@ -205,10 +209,9 @@ class MainWindow(QWidget):
         if result == QMessageBox.Yes:
             query = QSqlQuery()
             query.exec(
-                f"""DELETE FROM tasks 
+                f"""DELETE FROM {text}
                 WHERE id={our_id};"""
             )
-            self.load_tasks()
 
     # def delete_category(self):
     #     row = self.categories_list.currentRow()
